@@ -7,167 +7,113 @@ from src.rook import Rook
 class Pawn(Piece):
 	def __init__(self, code):
 		super().__init__(code)
-		self.has_moved = False
 	
-	def promote(self, board, dest_idx):
+	def promote(self, board, dest_rank, dest_file):
 		promotion = input('How would you like to promote your pawn?\n(Q)ueen, (R)ook, (B)ishop, or K(N)ight? ')
 		while promotion not in ['Q', 'R', 'B', 'N']:
 			promotion = input('How would you like to promote your pawn?\n(Q)ueen, (R)ook, (B)ishop, or K(N)ight? ')
 		if promotion == 'Q':
 			if self.color == 0:
-				board[dest_idx] = Queen(4)
+				board.data[dest_rank][dest_file] = Queen(4)
 			elif self.color == 1:
-				board[dest_idx] = Queen(10)
+				board.data[dest_rank][dest_file] = Queen(10)
 		elif promotion == 'R':
 			if self.color == 0:
-				board[dest_idx] = Rook(1)
+				board.data[dest_rank][dest_file] = Rook(1)
 			elif self.color == 1:
-				board[dest_idx] = Rook(7)
+				board.data[dest_rank][dest_file] = Rook(7)
 		elif promotion == 'B':
 			if self.color == 0:
-				board[dest_idx] = Bishop(3)
+				board.data[dest_rank][dest_file] = Bishop(3)
 			elif self.color == 1:
-				board[dest_idx] = Bishop(9)
+				board.data[dest_rank][dest_file] = Bishop(9)
 		elif promotion == 'N':
 			if self.color == 0:
-				board[dest_idx] = Knight(2)
+				board.data[dest_rank][dest_file] = Knight(2)
 			elif self.color == 1:
-				board[dest_idx] = Knight(8)
+				board.data[dest_rank][dest_file] = Knight(8)
 
-	def get_proximity(self, piece_idx):
-		''' Return the valid indices for the pawn, depending on class and location '''
-		# white piece orientation
-		if self.color == 0:
-			if not piece_idx % 8:
-				# piece is on the left edge of the board
-				return [piece_idx - 7, piece_idx - 8, piece_idx - 16] if not self.has_moved else [piece_idx - 7, piece_idx - 8]
-			elif piece_idx % 8 == 7:
-				# piece is on the right edge of the board
-				return [piece_idx - 8, piece_idx - 9, piece_idx - 16] if not self.has_moved else [piece_idx - 8, piece_idx - 9]
-			return [piece_idx - 9, piece_idx - 8, piece_idx - 7, piece_idx - 16] if not self.has_moved else [piece_idx - 9, piece_idx - 8, piece_idx - 7]
-		# black piece orientation
-		elif self.color == 1:
-			if not piece_idx % 8:
-				# piece is on the left edge of the board
-				return [piece_idx + 8, piece_idx + 9, piece_idx + 16] if not self.has_moved else [piece_idx + 8, piece_idx + 9]
-			elif piece_idx % 8 == 7:
-				# piece is on the right edge of the board
-				return [piece_idx + 7, piece_idx + 8, piece_idx + 16] if not self.has_moved else [piece_idx + 7, piece_idx + 8]
-			return [piece_idx + 7, piece_idx + 8, piece_idx + 9, piece_idx + 16] if not self.has_moved else [piece_idx + 7, piece_idx + 8, piece_idx + 9]
+	def get_proximity(self, piece_file, piece_rank):
+		''' Return the valid move indices for the pawn '''
+		if self.color == 1:
+			neighbors = [(piece_rank + 1, piece_file), (piece_rank + 1, piece_file - 1), (piece_rank + 1, piece_file + 1)]
+			if piece_rank == 1: neighbors.append((piece_rank + 2, piece_file))
+			return neighbors
+		elif self.color == 0:
+			neighbors = [(piece_rank - 1, piece_file), (piece_rank - 1, piece_file - 1), (piece_rank - 1, piece_file + 1)]
+			if piece_rank == 6: neighbors.append((piece_rank - 2, piece_file))
+			return neighbors
 
-	def valid_moves(self, board, piece_idx):
-		# return set of valid moves (diagonals and forward position); include next forward space if first move
-		return list(filter(board.in_bounds, self.get_proximity(piece_idx)))
-
-	def move(self, board, piece_idx, dest_idx):
+	def move(self, board, piece_file, piece_rank, dest_file, dest_rank):
 		''' Move pawn to position. Capture opponents on diagonal tiles, or adjacent tiles if using en passant '''
 		if self.color == 1:
-			if piece_idx + 8 == dest_idx or piece_idx + 16 == dest_idx:
-				# piece is being moved forward; swap pieces
-				board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-			else:
-				# pawn is capturing
-				if board.array[dest_idx].code:
-					# normal capture; swap pieces
-					board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-					# delete old piece
-					board.array[piece_idx] = Piece(0)
-				else:
-					# en passant capture
-					board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-					board.array[dest_idx - 8] = Piece(0)
-			# FIXME: if pawn gets to other side (lands on a tile 55 < x < 64), it can be promoted
-			# promote the black pieces if they reach the other side
-			if 55 < dest_idx < 64: self.promote(board.array, dest_idx)
+			if piece_file == dest_file:
+				# move pawn
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+			elif board.data[dest_rank][dest_file].code:
+				# swap pieces
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+				# capture opponent piece
+				board.data[piece_rank][piece_file] = Piece(0)
+			elif not board.data[dest_rank][dest_file].code:
+				# swap pieces
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+				# en passant capture
+				board.data[piece_rank][dest_file] = Piece(0)
+			if dest_rank == 7: self.promote(board, dest_rank, dest_file)
 		elif self.color == 0:
-			if piece_idx - 8 == dest_idx or piece_idx - 16 == dest_idx:
-				# piece is being moved forward
-				board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-			else:
-				# pawn is capturing
-				if board.array[dest_idx].code:
-					# normal capture; swap pieces
-					board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-					# delete old piece
-					board.array[piece_idx] = Piece(0)
-				else:
-					# en passant capture
-					board.array[piece_idx], board.array[dest_idx] = board.array[dest_idx], board.array[piece_idx]
-					board.array[dest_idx + 8] = Piece(0)
-			# FIXME: if pawn gets to other side (lands on a tile 0 =< x < 8), it can be promoted
-			# promote the black pieces if they reach the other side
-			if 0 <= dest_idx < 8: self.promote(board.array, dest_idx)
+			if piece_file == dest_file:
+				# move pawn
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+			elif board.data[dest_rank][dest_file].code:
+				# swap pieces
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+				# capture opponent piece
+				board.data[piece_rank][piece_file] = Piece(0)
+			elif not board.data[dest_rank][dest_file].code:
+				# swap pieces
+				board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+				# en passant capture
+				board.data[piece_rank][dest_file] = Piece(0)
+			if dest_rank == 0: self.promote(board, dest_rank, dest_file)
 
-	def can_move(self, board, last_move, piece_idx, dest_idx):
-		''' FIXME: determine whether or not piece_idx can move onto dest_idx
-			We need to ensure:
-				1) piece_idx and dest_idx correspond to indices in the board array
-				2) the move is in the particular piece's moveset
-				3) the space is either empty or contains an opponent's piece
-			Make sure the index is somewhere on the board.
-			For a pawn, we either want to move two spaces forward, one space forward, or a space diagonally
-			We can only move to an empty diagonal space if we're performing en passant
-		'''
-		# check that the destination index is in bounds of the array
-		# then, check that it is either:
-			# 1) directly in front of the pawn (move)
-				# if it's the player's first move, allow them to either move one or two steps, as long as there is no piece along the path
-				# otherwise, allow them to move one space forward, provided it is not occupies by another piece
-			# 2) diagonal to the pawn (capture)
-
+	def can_move(self, game, piece_file, piece_rank, dest_file, dest_rank):
+		''' Return True if the piece can move onto the specified space '''
 		# check if the destination index falls outside of the board
-		if not board.in_bounds(dest_idx): return False
-		# get moveset for pawns
-		moves = self.valid_moves(board, piece_idx)
-		if dest_idx in moves:
+		if not game.board.in_bounds((dest_rank, dest_file)): return False
+		# get list of valid moves
+		move_list = self.valid_moves(game.board, piece_file, piece_rank)
+		if (dest_rank, dest_file) in move_list:
 			if self.color == 1:
-				# check for a move forward
-				if piece_idx + 8 == dest_idx and not board.array[dest_idx].code:
-					# pawn is trying to move one space forward and the space is clear
-					return True
-				elif piece_idx + 16 == dest_idx and not self.has_moved and not board.array[dest_idx].code and not board.array[piece_idx + 8].code:
-					# pawn is trying to move two spaces forward and they're clear
-					return True
-				# check for a diagonal move; also check for the en passant scenario
-				elif piece_idx + 9 == dest_idx:
-					# try and move diagonally to the left
-					if board.array[dest_idx].code and self.is_opponent(board.array[dest_idx]):
-						# opponent piece can be captured
+				if piece_file == dest_file:
+					# pawn is moving forward
+					if piece_rank + 1 == dest_rank and not game.board.data[dest_rank][dest_file].code:
 						return True
-					elif not board.array[dest_idx].code and board.array[piece_idx + 1].code and self.is_opponent(board.array[piece_idx + 1] and last_move == piece_idx + 1):
-						# opponent piece can be captured by en passant
+					elif piece_rank + 2 == dest_rank and not game.board.data[dest_rank][dest_file].code and not game.board.data[piece_rank + 1][dest_file].code:
+						# pawn is moving two spaces forward
 						return True
-				elif piece_idx + 7 == dest_idx:
-					# try and move diagonally to the left
-					if board.array[dest_idx].code and self.is_opponent(board.array[dest_idx]):
-						# opponent piece can be captured
+				else:
+					# pawn is moving diagonally to capture
+					other_piece = game.board.data[dest_rank][dest_file]
+					if other_piece.code and self.is_opponent(other_piece):
 						return True
-					elif not board.array[dest_idx].code and board.array[piece_idx - 1].code and self.is_opponent(board.array[piece_idx - 1] and (31 < dest_idx < 40) and last_move == piece_idx - 1): #FIXME: opp must be on rank 5
-						# opponent piece can be captured by en passant
+					elif not other_piece.code and self.is_opponent(game.board.data[piece_rank][dest_file]) and game.board.data[piece_rank][dest_file].code == 6 and game.last_move == (piece_rank, dest_file):
+						# en passant
 						return True
 			elif self.color == 0:
-				# check for a move forward
-				if piece_idx - 8 == dest_idx and not board.array[dest_idx].code:
-					# pawn is trying to move one space forward and the space is clear
-					return True
-				elif piece_idx - 16 == dest_idx and not self.has_moved and not board.array[dest_idx].code and not board.array[piece_idx - 8].code:
-					# pawn is trying to move two spaces forward and 
-					return True
-				# check for a diagonal move; also check for the en passant scenario
-				elif piece_idx - 9 == dest_idx:
-					# try and move diagonally to the left
-					if board.array[dest_idx].code and self.is_opponent(board.array[dest_idx]):
-						# opponent piece can be captured
+				if piece_file == dest_file:
+					# pawn is moving forward
+					if piece_rank - 1 == dest_rank and not game.board.data[dest_rank][dest_file].code:
 						return True
-					elif not board.array[dest_idx].code and board.array[piece_idx - 1].code and self.is_opponent(board.array[piece_idx - 1]) and last_move == piece_idx - 1:
-						# opponent piece can be captured by en passant
+					elif piece_rank - 2 == dest_rank and not game.board.data[dest_rank][dest_file].code and not game.board.data[piece_rank - 1][dest_file].code:
+						# pawn is moving two spaces forward
 						return True
-				elif piece_idx - 7 == dest_idx:
-					# try and move diagonally to the left
-					if board.array[dest_idx].code and self.is_opponent(board.array[dest_idx]):
-						# opponent piece can be captured
+				else:
+					# pawn is moving diagonally to capture
+					other_piece = game.board.data[dest_rank][dest_file]
+					if other_piece.code and self.is_opponent(other_piece):
 						return True
-					elif not board.array[dest_idx].code and board.array[piece_idx + 1].code and self.is_opponent(board.array[piece_idx + 1] and (39 < dest_idx < 48) and last_move == piece_idx + 1): # FIXME: opp must be on rank 4
-						# opponent piece can be captured by en passant
+					elif not other_piece.code and self.is_opponent(game.board.data[piece_rank][dest_file]) and game.board.data[piece_rank][dest_file].code == 12 and game.last_move == (piece_rank, dest_file):
+						# en passant
 						return True
 		return False

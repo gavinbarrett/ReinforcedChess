@@ -11,7 +11,7 @@ class Player:
 		''' Give input control to user (real or AI) '''
 		src_piece = None
 		dest_tile = None
-		color = YELLOW if self.color else BLUE
+		color = BLUE if self.color else YELLOW
 		while src_piece not in self.indices:
 			src_piece = input(f'What to move? {color}>{END} ')
 		while dest_tile not in self.indices:
