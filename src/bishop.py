@@ -32,14 +32,9 @@ class Bishop(Piece):
 		if not game.board.in_bounds((dest_rank, dest_file)): return False
 		move_list = self.valid_moves(game.board, piece_file, piece_rank)
 		dest_idx = (dest_rank, dest_file)
-		if dest_idx in move_list[0]:
-			return self.check_path(game.board, move_list[0], dest_idx)
-		elif dest_idx in move_list[1]:
-			return self.check_path(game.board, move_list[1], dest_idx)
-		elif dest_idx in move_list[2]:
-			return self.check_path(game.board, move_list[2], dest_idx)
-		elif dest_idx in move_list[3]:
-			return self.check_path(game.board, move_list[3], dest_idx)
+		for move_set in move_list:
+			if dest_idx in move_set:
+				return self.check_path(game.board, move_set, dest_idx)
 		return False
 
 	def check_path(self, board, move_list, dest_idx):
