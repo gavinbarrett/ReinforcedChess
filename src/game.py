@@ -21,7 +21,7 @@ class Game:
 			# grab current piece
 			current_piece = self.board.data[piece_rank][piece_file]
 			# check for a valid move
-			if current_piece.can_move(self, piece_file, piece_rank, dest_file, dest_rank):
+			if current_piece.color == self.players[self.player].color and current_piece.can_move(self, piece_file, piece_rank, dest_file, dest_rank):
 				# move the piece
 				self.board.data[piece_rank][piece_file].move(self.board, piece_file, piece_rank, dest_file, dest_rank)
 				# emit new board state to output (stdout, or UI interface)

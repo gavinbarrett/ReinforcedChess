@@ -29,7 +29,7 @@ class Bishop(Piece):
 			board.data[piece_rank][piece_file] = Piece(0)
 
 	def can_move(self, game, piece_file, piece_rank, dest_file, dest_rank):
-		if not game.board.data[dest_rank][dest_file]: return False
+		if not game.board.in_bounds((dest_rank, dest_file)): return False
 		move_list = self.valid_moves(game.board, piece_file, piece_rank)
 		dest_idx = (dest_rank, dest_file)
 		if dest_idx in move_list[0]:

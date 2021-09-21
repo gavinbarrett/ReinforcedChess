@@ -17,7 +17,7 @@ class Board:
 			[Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0)],
 			[Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0)],
 			[Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0), Piece(0)],
-			[Pawn(6), Pawn(6), Pawn(6), Piece(0), Pawn(6), Pawn(6), Pawn(6), Pawn(6)],
+			[Piece(0), Pawn(6), Pawn(6), Pawn(6), Pawn(6), Pawn(6), Pawn(6), Pawn(6)],
 			[Rook(1), Knight(2), Bishop(3), Queen(4), King(5), Bishop(3), Knight(2), Rook(1)]
 		]
 		self.indices = Indices().idxs
