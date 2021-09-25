@@ -11,8 +11,8 @@ class Piece:
 			# piece is black
 			self.color = 1
 
-	def get_proximity(self, piece_file, piece_rank):
-		pass
+	def get_proximity(self, board, piece_file, piece_rank):
+		return []
 
 	def move(self, board, piece_file, piece_rank, dest_file, dest_rank):
 		pass
@@ -24,6 +24,6 @@ class Piece:
 		''' Return true if other tile contains an opponent piece '''
 		return piece_2.color != None and self.color != piece_2.color
 	
-	def valid_moves(self, board, piece_file, piece_rank):
-		# return set of valid moves (diagonals and forward position); include next forward space if first move
-		return list(filter(board.in_bounds, self.get_proximity(piece_file, piece_rank)))
+	def valid_moves(self, game, piece_file, piece_rank):
+		# return set of valid moves (diagonals and forward position); include next forward space if first move	
+		return list(filter(game.board.in_bounds, self.get_proximity(game, piece_file, piece_rank)))

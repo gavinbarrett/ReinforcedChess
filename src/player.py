@@ -5,7 +5,7 @@ from src.colors import BLUE, YELLOW, END
 class Player:
 	def __init__(self, color):
 		self.color = color
-		self.indices = Indices().idxs
+		self.indices = Indices.idxs
 
 	def get_move(self):
 		''' Give input control to user (real or AI) '''
