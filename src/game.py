@@ -1,5 +1,6 @@
 from copy import deepcopy
 from src.board import Board
+from src.coords import compute_coord
 
 class Game:
 	def __init__(self, player_1, player_2, board):
@@ -27,8 +28,10 @@ class Game:
 		# print endgame board state
 		self.display()
 		if self.winner == 0 or self.winner == 1:
-			winner = "White" if not self.winner else "Black"
-			print(f'{winner} won!')
+			if not self.winner:
+				print(f'Black was checkmated!\nWhite won!')
+			else:
+				print(f'White was checkmated!\nBlack won!')
 		else:
 			print(f'Players reached a stalemate!')
 
@@ -40,17 +43,17 @@ class Game:
 		# prompt the user for a move
 		piece_idx, dest_idx = self.players[self.player].get_move()
 		# compute the file and rank of the source and destination pieces
-		piece_rank, piece_file = self.board.compute_coord(piece_idx)
-		dest_rank, dest_file = self.board.compute_coord(dest_idx)
+		piece_rank, piece_file = compute_coord(piece_idx)
+		dest_rank, dest_file = compute_coord(dest_idx)
 		return piece_rank, piece_file, dest_rank, dest_file
 
 	def execute_move(self, piece_rank, piece_file, dest_rank, dest_file):
 		# grab current piece
 		current_piece = self.board.data[piece_rank][piece_file]
 		# check for a valid move
-		if current_piece.color == self.players[self.player].color and current_piece.code and current_piece.can_move(self, piece_rank, piece_file, dest_rank, dest_file):
+		if current_piece.color == self.players[self.player].color and current_piece.code and current_piece.can_move(self, dest_rank, dest_file):
 			# move the piece
-			self.board.data[piece_rank][piece_file].move(self.board, piece_rank, piece_file, dest_rank, dest_file)
+			current_piece.move(self.board, dest_rank, dest_file)
 			# save previous move (for en passant)
 			self.last_move = (dest_rank, dest_file)
 			# update player pieces
@@ -67,19 +70,14 @@ class Game:
 		self.player = (self.player + 1) % 2
 
 	def checkmate(self, king, pieces):
-		# look if current player is in check, if not return false
-		# if they are, look at valid moves
-		# if valid moves will all be checkable
-		# and if the moving
 		king_piece = self.board.data[king[0]][king[1]]
-		if king_piece.in_check: # and king_piece.color == self.player:
-			# retrieve moves of the king
+		if king_piece.in_check:
 			# check if pieces can block or capture attacking pieces
 			for piece in pieces:
 				# pull piece from the board
 				p = self.board.data[piece[0]][piece[1]]
 				# retrieve the list of moves for that piece
-				p_moves = p.valid_moves(self, piece[0], piece[1])
+				p_moves = p.valid_moves(self)
 				# test every move the piece can make
 				for p_move in p_moves:
 					# copy the game state to test moves
@@ -87,7 +85,7 @@ class Game:
 					# pull new piece
 					new_piece = new_state.board.data[piece[0]][piece[1]]
 					# test move the piece in the new game state
-					new_piece.move(new_state.board, piece[0], piece[1], p_move[0], p_move[1])					
+					new_piece.move(new_state.board, p_move[0], p_move[1])					
 					# check for king
 					if new_piece.code in [5, 11]:
 						# piece is a king that's now located at (p_move[0], p_move[1])
@@ -98,7 +96,7 @@ class Game:
 						# piece is a king that's now located at (p_move[0], p_move[1])
 						new_king_piece = new_state.board.data[king[0]][king[1]]
 						# get the kings new moves after moving it
-						new_moves = new_king_piece.valid_moves(new_state, king[0], king[1])
+						new_moves = new_king_piece.valid_moves(new_state)
 						for new_move in new_moves:
 							check = new_king_piece.checkable(new_state, new_move[0], new_move[1])
 							if not check:
@@ -111,12 +109,10 @@ class Game:
 	def at_checkmate(self):
 		checkmated = self.checkmate(self.board.blk_king, self.board.blk_pieces)
 		if checkmated:
-			print(f'Black has been checkmated')
 			self.winner = 0
 		return checkmated
 		checkmated = self.checkmate(self.board.wht_king, self.board.wht_pieces)
 		if checkmated: 
-			print(f'White has been checkmated')
 			self.winner = 1
 		return checkmated
 
@@ -126,12 +122,12 @@ class Game:
 		if not king_piece.in_check:
 			for piece_idx in pieces:
 				piece = self.board.data[piece_idx[0]][piece_idx[1]]					
-				valid = piece.valid_moves(self, piece_idx[1], piece_idx[0])
+				valid = piece.valid_moves(self)
 				# only filter the move set if the piece is a king
 				if piece.code == 5 or piece.code == 11:
-					for v in valid:
-						if not king_piece.checkable(self, v[1], v[0]):
-							moves += [v]
+					for val in valid:
+						if not king_piece.checkable(self, val[0], val[1]):
+							moves += [val]
 				else:
 					moves += valid
 			return not moves

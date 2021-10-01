@@ -1,43 +1,48 @@
 from src.piece import Piece
 
 class Queen(Piece):
-	def __init__(self, code):
-		super().__init__(code)
+	def __init__(self, code, position):
+		super().__init__(code, position)
 		self.value = 9
 	
-	def get_proximity(self, game, piece_rank, piece_file):
+	def get_proximity(self, game):
+		rank, file_ = self.rank, self.file_
 		return [
 			# horizontal / vertical moves
-			list(filter(game.board.in_bounds, [(piece_rank, piece_file - 1), (piece_rank, piece_file - 2), (piece_rank, piece_file - 3), (piece_rank, piece_file - 4), (piece_rank, piece_file - 5), (piece_rank, piece_file - 6), (piece_rank, piece_file - 7)])),
-			list(filter(game.board.in_bounds, [(piece_rank, piece_file + 1), (piece_rank, piece_file + 2), (piece_rank, piece_file + 3), (piece_rank, piece_file + 4), (piece_rank, piece_file + 5), (piece_rank, piece_file + 6), (piece_rank, piece_file + 7)])),
-			list(filter(game.board.in_bounds, [(piece_rank - 1, piece_file), (piece_rank - 2, piece_file), (piece_rank - 3, piece_file), (piece_rank - 4, piece_file), (piece_rank - 5, piece_file), (piece_rank - 6, piece_file), (piece_rank - 7, piece_file)])),
-			list(filter(game.board.in_bounds, [(piece_rank + 1, piece_file), (piece_rank + 2, piece_file), (piece_rank + 3, piece_file), (piece_rank + 4, piece_file), (piece_rank + 5, piece_file), (piece_rank + 6, piece_file), (piece_rank + 7, piece_file)])),
+			list(filter(game.board.in_bounds, [(rank, file_ - 1), (rank, file_ - 2), (rank, file_ - 3), (rank, file_ - 4), (rank, file_ - 5), (rank, file_ - 6), (rank, file_ - 7)])),
+			list(filter(game.board.in_bounds, [(rank, file_ + 1), (rank, file_ + 2), (rank, file_ + 3), (rank, file_ + 4), (rank, file_ + 5), (rank, file_ + 6), (rank, file_ + 7)])),
+			list(filter(game.board.in_bounds, [(rank - 1, file_), (rank - 2, file_), (rank - 3, file_), (rank - 4, file_), (rank - 5, file_), (rank - 6, file_), (rank - 7, file_)])),
+			list(filter(game.board.in_bounds, [(rank + 1, file_), (rank + 2, file_), (rank + 3, file_), (rank + 4, file_), (rank + 5, file_), (rank + 6, file_), (rank + 7, file_)])),
 			# diagonal moves
-			list(filter(game.board.in_bounds, [(piece_rank - 1, piece_file - 1), (piece_rank - 2, piece_file - 2), (piece_rank - 3, piece_file - 3), (piece_rank - 4, piece_file - 4), (piece_rank - 5, piece_file - 5), (piece_rank - 6, piece_file - 6), (piece_rank - 7, piece_file - 7)])),
-			list(filter(game.board.in_bounds, [(piece_rank - 1, piece_file + 1), (piece_rank - 2, piece_file + 2), (piece_rank - 3, piece_file + 3), (piece_rank - 4, piece_file + 4), (piece_rank - 5, piece_file + 5), (piece_rank - 6, piece_file + 6), (piece_rank - 7, piece_file + 7)])),
-			list(filter(game.board.in_bounds, [(piece_rank + 1, piece_file - 1), (piece_rank + 2, piece_file - 2), (piece_rank + 3, piece_file - 3), (piece_rank + 4, piece_file - 4), (piece_rank + 5, piece_file - 5), (piece_rank + 6, piece_file - 6), (piece_rank + 7, piece_file - 7)])),
-			list(filter(game.board.in_bounds, [(piece_rank + 1, piece_file + 1), (piece_rank + 2, piece_file + 2), (piece_rank + 3, piece_file + 3), (piece_rank + 4, piece_file + 4), (piece_rank + 5, piece_file + 5), (piece_rank + 6, piece_file + 6), (piece_rank + 7, piece_file + 7)]))
+			list(filter(game.board.in_bounds, [(rank - 1, file_ - 1), (rank - 2, file_ - 2), (rank - 3, file_ - 3), (rank - 4, file_ - 4), (rank - 5, file_ - 5), (rank - 6, file_ - 6), (rank - 7, file_ - 7)])),
+			list(filter(game.board.in_bounds, [(rank - 1, file_ + 1), (rank - 2, file_ + 2), (rank - 3, file_ + 3), (rank - 4, file_ + 4), (rank - 5, file_ + 5), (rank - 6, file_ + 6), (rank - 7, file_ + 7)])),
+			list(filter(game.board.in_bounds, [(rank + 1, file_ - 1), (rank + 2, file_ - 2), (rank + 3, file_ - 3), (rank + 4, file_ - 4), (rank + 5, file_ - 5), (rank + 6, file_ - 6), (rank + 7, file_ - 7)])),
+			list(filter(game.board.in_bounds, [(rank + 1, file_ + 1), (rank + 2, file_ + 2), (rank + 3, file_ + 3), (rank + 4, file_ + 4), (rank + 5, file_ + 5), (rank + 6, file_ + 6), (rank + 7, file_ + 7)]))
 		]
 
-	def valid_moves(self, game, piece_rank, piece_file):
+	def valid_moves(self, game):
 		# return set of valid moves (diagonals and forward position); include next forward space if first move
-		move_set = self.get_proximity(game, piece_rank, piece_file)
+		move_set = self.get_proximity(game)
 		# unpack the valid moves from the list
 		moves = []
 		for move in move_set:
 			moves.extend(self.check_path(game.board, move))
 		return moves
 
-	def move(self, board, piece_rank, piece_file, dest_rank, dest_file):
+	def move(self, board, dest_rank, dest_file):
+		rank, file_ = self.rank, self.file_
 		# swap pieces
-		board.data[piece_rank][piece_file], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[piece_rank][piece_file]
+		board.data[rank][file_], board.data[dest_rank][dest_file] = board.data[dest_rank][dest_file], board.data[rank][file_]
 		# capture piece
-		if board.data[piece_rank][piece_file].code:
-			board.data[piece_rank][piece_file] = Piece(0)
+		if board.data[rank][file_].code:
+			board.data[rank][file_] = Piece(0, (rank * 8) + file_)
+		# update piece coordinates
+		self.rank = dest_rank
+		self.file_ = dest_file
 
-	def can_move(self, game, piece_rank, piece_file, dest_rank, dest_file):
+	def can_move(self, game, dest_rank, dest_file):
 		if not game.board.in_bounds((dest_rank, dest_file)): return False
-		move_list = self.valid_moves(game, piece_rank, piece_file)
+		move_list = self.valid_moves(game)
 		return (dest_rank, dest_file) in move_list
 	
 	def check_path(self, board, move_list):
