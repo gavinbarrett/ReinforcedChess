@@ -65,24 +65,25 @@ class Board:
 		# iterate through blk_pieces
 		blk_vector = []
 		for blk_piece in game.board.blk_pieces:
-			target = game.board.data[blk_piece[1]][blk_piece[0]]
+			target = game.board.data[blk_piece[0]][blk_piece[1]]
 			blk_vector += target.valid_moves(game, blk_piece[0], blk_piece[1])
 		king = game.board.wht_king
 		if king in blk_vector:
-			game.board.data[king[1]][king[0]].in_check = True
+			game.board.data[king[0]][king[1]].in_check = True
 			print(f'White is in check!')
 		else:
-			game.board.data[king[1]][king[0]].in_check = False
+			game.board.data[king[0]][king[1]].in_check = False
 		wht_vector = []
 		for wht_piece in game.board.wht_pieces:
-			target = game.board.data[wht_piece[1]][wht_piece[0]]
-			wht_vector += target.valid_moves(game, wht_piece[0], wht_piece[1])
+			target = game.board.data[wht_piece[0]][wht_piece[1]]
+			ms = target.valid_moves(game, wht_piece[0], wht_piece[1])
+			wht_vector += ms
 		king = game.board.blk_king
 		if king in wht_vector:
-			game.board.data[king[1]][king[0]].in_check = True
+			game.board.data[king[0]][king[1]].in_check = True
 			print(f'Black is in check!')
 		else:
-			game.board.data[king[1]][king[0]].in_check = False
+			game.board.data[king[0]][king[1]].in_check = False
 	
 	def compute_coord(self, piece_idx):
 		''' Return the file and rank of the piece '''

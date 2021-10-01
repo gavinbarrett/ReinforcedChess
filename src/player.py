@@ -17,3 +17,6 @@ class Player:
 		while dest_tile not in self.indices:
 			dest_tile = input(f'Where to move? {color}>{END} ')
 		return self.indices[src_piece], self.indices[dest_tile]
+	
+	def get_valid_moves(self):
+		pass

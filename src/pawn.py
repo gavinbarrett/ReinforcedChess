@@ -34,7 +34,7 @@ class Pawn(Piece):
 			elif self.color == 1:
 				board.data[dest_rank][dest_file] = Knight(8)
 
-	def get_proximity(self, game, piece_file, piece_rank):
+	def get_proximity(self, game, piece_rank, piece_file):
 		''' Return the valid move indices for the pawn '''
 		length = len(game.board.data)
 		if self.color == 1:
@@ -80,7 +80,7 @@ class Pawn(Piece):
 					neighbors.append((piece_rank - 1, piece_file + 1))
 			return list(filter(game.board.in_bounds, neighbors))
 
-	def move(self, board, piece_file, piece_rank, dest_file, dest_rank):
+	def move(self, board, piece_rank, piece_file, dest_rank, dest_file):
 		''' Move pawn to position. Capture opponents on diagonal tiles, or adjacent tiles if using en passant '''
 		if self.color == 1:
 			if piece_file == dest_file:
@@ -115,12 +115,12 @@ class Pawn(Piece):
 			# check for promotion
 			if dest_rank == 0: self.promote(board, dest_rank, dest_file)
 
-	def can_move(self, game, piece_file, piece_rank, dest_file, dest_rank):
+	def can_move(self, game, piece_rank, piece_file, dest_rank, dest_file):
 		''' Return True if the piece can move onto the specified space '''
 		# check if the destination index falls outside of the board
 		if not game.board.in_bounds((dest_rank, dest_file)): return False
 		# get list of valid moves
-		move_list = self.valid_moves(game, piece_file, piece_rank)
+		move_list = self.valid_moves(game, piece_rank, piece_file)
 		if (dest_rank, dest_file) in move_list:
 			if self.color == 1:
 				if piece_file == dest_file:
