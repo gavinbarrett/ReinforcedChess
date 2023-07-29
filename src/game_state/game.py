@@ -1,6 +1,6 @@
 from copy import deepcopy
-from src.board import Board
-from src.coords import compute_coord
+from src.game_state.board import Board
+from src.game_state.coords import compute_coord
 
 class Game:
 	def __init__(self, player_1, player_2, board):

@@ -1,8 +1,8 @@
-from src.piece import Piece
-from src.bishop import Bishop
-from src.knight import Knight
-from src.queen import Queen
-from src.rook import Rook
+from src.pieces.piece import Piece
+from src.pieces.bishop import Bishop
+from src.pieces.knight import Knight
+from src.pieces.queen import Queen
+from src.pieces.rook import Rook
 
 class Pawn(Piece):
 	def __init__(self, code, position):

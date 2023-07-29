@@ -1,6 +1,6 @@
-from src.piece import Piece
-from src.indices import Indices
-from src.colors import BLUE, YELLOW, END
+from src.pieces.piece import Piece
+from src.game_state.indices import Indices
+from src.game_state.colors import BLUE, YELLOW, END
 
 class Player:
 	def __init__(self, color):

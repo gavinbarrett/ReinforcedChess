@@ -1,13 +1,13 @@
-from src.piece import Piece
-from src.pawn import Pawn
-from src.bishop import Bishop
-from src.rook import Rook
-from src.knight import Knight
-from src.king import King
-from src.queen import Queen
-from src.indices import Indices
-from src.colors import BLUE, YELLOW, WHITE, END
-from src.coords import compute_coord
+from src.pieces.piece import Piece
+from src.pieces.pawn import Pawn
+from src.pieces.bishop import Bishop
+from src.pieces.rook import Rook
+from src.pieces.knight import Knight
+from src.pieces.king import King
+from src.pieces.queen import Queen
+from src.game_state.indices import Indices
+from src.game_state.colors import BLUE, YELLOW, WHITE, END
+from src.game_state.coords import compute_coord
 
 default_board = b'\x07\x08\x09\x0a\x0b\x09\x08\x07\x0c\x0c\x0c\x0c\x0c\x0c\x0c\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06\x06\x06\x06\x06\x06\x06\x06\x01\x02\x03\x04\x05\x03\x02\x01'
 

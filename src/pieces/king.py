@@ -1,4 +1,4 @@
-from src.piece import Piece
+from src.pieces.piece import Piece
 
 class King(Piece):
 	def __init__(self, code, position):

@@ -1,4 +1,4 @@
-from src.coords import compute_coord
+from src.game_state.coords import compute_coord
 
 class Piece:
 	def __init__(self, code, position):
